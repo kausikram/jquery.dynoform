@@ -1,0 +1,115 @@
+<!DOCTYPE HTML>
+<html>
+<head>
+    <title>Example: Dyno Forms</title>
+    <link href="http://netdna.bootstrapcdn.com/twitter-bootstrap/2.3.1/css/bootstrap-combined.min.css" rel="stylesheet">
+    <script type="text/javascript" src="http://code.jquery.com/jquery-1.9.1.min.js"></script>
+    <script type="text/javascript" src="./jquery.dynoform.js"></script>
+
+    <script type="text/javascript">
+    var form = {
+        "name" : "form_1",
+        "id" : "form_1",
+        "method":"POST",
+        "action":"."
+    };
+    fieldsets = [["Personal Details", "personal", {}], ["Education", "education", {}], ["Contacts", "contacts", {}], ["Survey", "survey", {}]];
+    var fields = [
+        {
+            "name":"full_name",
+            "label": "Full Name",
+            "fieldset":"personal",
+            "type": "text"
+        },
+        {
+            "name": "nick_name",
+            "fieldset":"personal",
+            "label":"Nick Name",
+            "type":"text"
+        },
+        {
+            "name": "date_of_birth",
+            "fieldset":"personal",
+            "label":"Date of Birth",
+            "type":"text"
+        },
+        {
+            "name": "school_name",
+            "fieldset": "education",
+            "label":"School",
+            "type": "text"
+        },
+        {
+            "name": "date_of_joining",
+            "fieldset":"education",
+            "label":"Date of Joining",
+            "type":"text"
+        },
+        {
+            "name": "class",
+            "fieldset": "education",
+            "label":"Class Studying Currently",
+            "type": "text"
+        },
+        {
+            "name": "contact_phone",
+            "fieldset":"contacts",
+            "label":"Contact Number",
+            "type": "text"
+        },
+        {
+            "name": "address",
+            "fieldset":"contacts",
+            "label":"Address",
+            "type": "textarea"
+        },
+        {
+            "name": "city",
+            "fieldset":"contacts",
+            "label":"City",
+            "type": "select",
+            "options":[["Chennai","chn"],["Mumbai","mum"],["New Delhi","del"]]
+        },
+        {
+            "name": "vehicles",
+            "fieldset":"survey",
+            "label":"What are the types of vehicles you own",
+            "type": "checkbox",
+            "options":[["Car","car"],["Motor Cycle","motor"],["Cycle","cycle"]]
+        },
+        {
+            "name": "food",
+            "fieldset":"survey",
+            "label":"Do you like Mexican Food ?",
+            "type": "radio",
+            "options":[["Yes","yes"],["No","no"],["May Be","maybe"]]
+        }
+
+    ];
+
+    var buttons = [
+        {
+            "type":"submit",
+            "class":"btn btn-primary",
+            "fieldset":"survey",
+            "value":"Save"
+        },
+        {
+            "type":"reset",
+            "fieldset":"survey",
+            "class":"btn",
+            "value": "Clear"
+        }
+    ];
+
+    var values = {};
+    jQuery(document).ready(function(){
+        jQuery(".container").dynoForm({"form":form, "fields":fields, "buttons":buttons, "fieldsets":fieldsets});
+    });
+
+    </script>
+</head>
+<body>
+<div class="container"></div>
+</body>
+</html>
