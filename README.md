@@ -7,12 +7,27 @@ Look at the included example.html for a better understanding of how jQuery.dynoF
 
 ### TODO
 These are a list of things that need to be done:
-* Allow loading of Values Through Ajax calls
-* Allow binding to form submit and form clear events
-* Allow adding attributes to various fields
-* Allow adding attributes to fieldsets
-* Allow loading of structure through ajax calls
-* Allow setting of values pragmatically.
+* Create Events
+    * for form render complete
+    * for form value loaded
+    * for form submit
+    * for form reset
+
+* Create Methods
+    * To Add Field
+    * Remove Field
+    * Set Value of Field
+    * Add Fieldset
+
+* Allow adding attributes
+    * ~~to form~~
+    * to fields
+    * to fieldsets
+
+* Allow ajax calls
+    * for loading structures
+    * for loading values
+
 
 ### License
 DynoForm is released under a BSD license. You can play all you want. Feel free to contribute or buy me food.
