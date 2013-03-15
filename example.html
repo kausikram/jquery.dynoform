@@ -91,12 +91,10 @@
         {
             "type":"submit",
             "class":"btn btn-primary",
-            "fieldset":"survey",
             "value":"Save"
         },
         {
             "type":"reset",
-            "fieldset":"survey",
             "class":"btn",
             "value": "Clear"
         }
@@ -104,12 +102,139 @@
 
     var values = {};
     jQuery(document).ready(function(){
-        jQuery(".container").dynoForm({"form":form, "fields":fields, "buttons":buttons, "fieldsets":fieldsets});
+        jQuery(".form_container").dynoForm({"form":form, "fields":fields, "buttons":buttons, "fieldsets":fieldsets});
     });
 
     </script>
 </head>
 <body>
-<div class="container"></div>
+<div class="container">
+    <div class="row">
+        <div class="span12">
+            <h1> Dyno Form Example and Documentation</h1>
+            <h2> Simple Example</h2>
+            <p>In order to generate a form, you need to ensure that you call the dynoForm with 4 properties.</p>
+            <dl>
+                <dt>form</dt>
+                <dd>A map with all the attribute values (name, action, method etc) values that your form will need.</dd>
+                <dt>fieldsets</dt>
+                <dd>A list of triplets, each triplet referring to a Fieldsets legend, its name and finally a map of fieldset attributes.</dd>
+                <dt>fields</dt>
+                <dd>A list of maps, each map should have a name, a label, a type. Types can be "textarea", "text", "password", "select", "checkbox" etc. In case of "select" and "checkbox", an Additional map key called "options" should be present which should be a list of pairs. each pair representing the Display name and value.</dd>
+                <dt>buttons</dt>
+                <dd> A list of maps. each map representing a button that the form will contain. each of these maps are a representation of the button attributes.</dd>
+            </dl>
+        </div>
+    </div>
+    <div class="row">
+        <div class="span6">
+            <h3>Output</h3>
+            <div class="form_container"></div>
+        </div>
+        <div class="span6">
+            <h3>Code</h3>
+            <pre>
+var form = {
+    "name" : "form_1",
+    "id" : "form_1",
+    "method":"POST",
+    "action":"."
+};
+fieldsets = [["Personal Details", "personal", {}], ["Education", "education", {}], ["Contacts", "contacts", {}], ["Survey", "survey", {}]];
+var fields = [
+    {
+        "name":"full_name",
+        "label": "Full Name",
+        "fieldset":"personal",
+        "type": "text"
+    },
+    {
+        "name": "nick_name",
+        "fieldset":"personal",
+        "label":"Nick Name",
+        "type":"text"
+    },
+    {
+        "name": "date_of_birth",
+        "fieldset":"personal",
+        "label":"Date of Birth",
+        "type":"text"
+    },
+    {
+        "name": "school_name",
+        "fieldset": "education",
+        "label":"School",
+        "type": "text"
+    },
+    {
+        "name": "date_of_joining",
+        "fieldset":"education",
+        "label":"Date of Joining",
+        "type":"text"
+    },
+    {
+        "name": "class",
+        "fieldset": "education",
+        "label":"Class Studying Currently",
+        "type": "text"
+    },
+    {
+        "name": "contact_phone",
+        "fieldset":"contacts",
+        "label":"Contact Number",
+        "type": "text"
+    },
+    {
+        "name": "address",
+        "fieldset":"contacts",
+        "label":"Address",
+        "type": "textarea"
+    },
+    {
+        "name": "city",
+        "fieldset":"contacts",
+        "label":"City",
+        "type": "select",
+        "options":[["Chennai","chn"],["Mumbai","mum"],["New Delhi","del"]]
+    },
+    {
+        "name": "vehicles",
+        "fieldset":"survey",
+        "label":"What are the types of vehicles you own",
+        "type": "checkbox",
+        "options":[["Car","car"],["Motor Cycle","motor"],["Cycle","cycle"]]
+    },
+    {
+        "name": "food",
+        "fieldset":"survey",
+        "label":"Do you like Mexican Food ?",
+        "type": "radio",
+        "options":[["Yes","yes"],["No","no"],["May Be","maybe"]]
+    }
+
+];
+
+var buttons = [
+    {
+        "type":"submit",
+        "class":"btn btn-primary",
+        "value":"Save"
+    },
+    {
+        "type":"reset",
+        "class":"btn",
+        "value": "Clear"
+    }
+];
+
+var values = {};
+jQuery(document).ready(function(){
+    jQuery(".form_container").dynoForm({"form":form, "fields":fields, "buttons":buttons, "fieldsets":fieldsets});
+});
+            </pre>
+        </div>
+    </div>
+</div>
+
 </body>
 </html>

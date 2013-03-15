@@ -1,4 +1,4 @@
-### README
+### Quick Documentation
 jQuery DynoForm is a way to create and manipulate complex form structures. All you need to do is define the structure using JSON. and TaDa your form is created.
 
     jQuery(el).dynoforms(options);
@@ -10,8 +10,6 @@ These are a list of things that need to be done:
 * Create Events
     * for form render complete
     * for form value loaded
-    * for form submit
-    * for form reset
 
 * Create Methods
     * To Add Field
