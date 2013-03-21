@@ -83,7 +83,6 @@
 
             case "checkbox":
                 var data = this.createCheckboxAndRadio(field_map);
-                console.log(data);
                 return data;
 
             case "radio":
@@ -91,6 +90,11 @@
         }
 
         el.attr("name", field_map["name"]);
+        if(field_map["extra_attributes"]){
+            for (var key in field_map["extra_attributes"]){
+                el.attr(key, field_map["extra_attributes"][key]);
+            }
+        }
         return el;
     };
 

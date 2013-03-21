@@ -19,7 +19,7 @@ These are a list of things that need to be done:
 
 * Allow adding attributes
     * ~~to form~~
-    * to fields
+    * ~~to fields~~
     * to fieldsets
 
 * Allow ajax calls
