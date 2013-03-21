@@ -120,8 +120,23 @@
 
     DynoForm.prototype.updateValues = function () {
         if(this.values) {
-            for(var key in this.values){
-                this.$form.find("[name='" + key +"']").val(this.values[key]);
+            for (var i=0; i< this.fields.length; i++) {
+                var field_map = this.fields[i];
+                var field_name = field_map["name"];
+                if (!this.values[field_name]) {
+                    continue;
+                }
+                if (field_map["type"] == "checkbox") {
+                    for( var value_index in this.values[field_name]){
+                        this.$form.find("[name='" + field_name +"[]'][value='" + this.values[field_name][value_index] + "']").attr("checked","checked");
+                    }
+                    continue;
+                }
+                if (field_map["type"] == "radio") {
+                    this.$form.find("[name='" + field_name +"'][value='" + this.values[field_name]+ "']").attr("checked","checked");
+                    continue;
+                }
+                this.$form.find("[name='" + field_name +"']").val(this.values[field_name]);
             }
         }
     };

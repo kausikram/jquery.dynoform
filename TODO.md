@@ -18,3 +18,8 @@ These are a list of things that need to be done:
 * Allow ajax calls
     * for loading structures
     * for loading values
+
+
+* Additional input types for which support must be introduced
+    * Multiple Select Box
+    * html5 inputs
