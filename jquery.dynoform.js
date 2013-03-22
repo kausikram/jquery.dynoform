@@ -6,6 +6,8 @@
         this.values = options["values"];
         this.buttons = options["buttons"];
         this.fieldsets= options["fieldsets"];
+        this.global_errors = options["global_errors"];
+        this.errors = options["errors"];
         this.renderForm();
     }
 
@@ -141,6 +143,46 @@
         }
     };
 
+    DynoForm.prototype.getErrorMessage = function(message){
+        var div = $("<div>");
+        div.addClass("error");
+        div.html(message);
+        return div;
+    }
+
+    DynoForm.prototype.displayErrors = function () {
+        if(this.errors) {
+            for (var i=0; i< this.fields.length; i++) {
+                var field_map = this.fields[i];
+                var field_name = field_map["name"];
+                if (!this.errors[field_name]) {
+                    continue;
+                }
+                var error_message = this.getErrorMessage(this.errors[field_name]);
+                var dom_to_atttach_to = this.$form.find("[name='" + field_name +"']:last");
+                if (field_map["type"] == "checkbox") {
+                    //name of checkbox altered to
+                    dom_to_atttach_to = this.$form.find("[name='" + field_name +"[]']:last").parent();
+
+                }
+                if (field_map["type"] == "radio") {
+                    //name of checkbox altered to
+                    dom_to_atttach_to = this.$form.find("[name='" + field_name +"']:last").parent();
+
+                }
+
+                dom_to_atttach_to.after(error_message);
+            }
+        }
+    };
+
+    DynoForm.prototype.displayGlobalError = function(){
+        if(this.global_errors){
+            var error_message = this.getErrorMessage(this.global_errors);
+        }
+        this.$form.prepend(error_message);
+    };
+
     DynoForm.prototype.createActionButtons = function () {
         for (var i in this.buttons){
             var button = $("<input>");
@@ -158,6 +200,8 @@
         this.createFieldsets();
         this.updateFormFields();
         this.updateValues();
+        this.displayErrors();
+        this.displayGlobalError();
         this.createActionButtons();
         this.$element.append(this.$form);
     };
