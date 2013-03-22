@@ -151,9 +151,9 @@
 
     DynoForm.prototype.getErrorMessage = function(message){
         function _compose_message(msgs){
-            var $list = jQuery("<ul>");
+            var $list = $("<ul>");
             for(var index in msgs){
-                var $li = jQuery("<li>");
+                var $li = $("<li>");
                 $li.html(msgs[index]);
                 $list.append($li);
             }
