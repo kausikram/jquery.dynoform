@@ -12,12 +12,12 @@ These are a list of things that need to be done:
 * Displaying Errors
     * ~~Element Errors~~
     * ~~Global Errors~~
-    * Callback based Error Generator
+    * ~~Callback based Error Generator~~
 * Allow adding attributes
     * ~~to form~~
     * ~~to fields~~
-    * to errors
     * ~~to fieldsets~~
+    * to errors
 * Allow ajax calls
     * for loading structures
     * for loading values

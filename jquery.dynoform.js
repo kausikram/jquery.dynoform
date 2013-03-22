@@ -8,6 +8,7 @@
         this.fieldsets= options["fieldsets"];
         this.global_errors = options["global_errors"];
         this.errors = options["errors"];
+        this.error_template = options["error_template"];
         this.renderForm();
     }
 
@@ -149,11 +150,24 @@
     };
 
     DynoForm.prototype.getErrorMessage = function(message){
+        function _compose_message(msgs){
+            var $list = jQuery("<ul>");
+            for(var index in msgs){
+                var $li = jQuery("<li>");
+                $li.html(msgs[index]);
+                $list.append($li);
+            }
+            return $list;
+        }
+        var composed_message = $.isArray(message) ? _compose_message(message) : message;
+        if(this.error_template){
+            return this.error_template(composed_message);
+        }
         var div = $("<div>");
         div.addClass("error");
-        div.html(message);
+        div.html(composed_message);
         return div;
-    }
+    };
 
     DynoForm.prototype.displayErrors = function () {
         if(this.errors) {

@@ -104,5 +104,19 @@ var global_errors = ["This form was not submitted properly."];
 jQuery(document).ready(function(){
     jQuery(".form_container").dynoForm({"form":form, "fields":fields_full, "buttons":buttons, "fieldsets":fieldsets_full});
     jQuery(".form_container_2").dynoForm({"form":form, "fields":fields_small, "buttons":buttons, "fieldsets":fieldsets_small, "values":values});
-    jQuery(".form_container_3").dynoForm({"form":form, "fields":fields_small, "buttons":buttons, "fieldsets":fieldsets_small, "values":values, "errors":errors, "global_errors":global_errors});
+    jQuery(".form_container_3").dynoForm({
+        "form":form,
+        "fields":fields_small,
+        "buttons":buttons,
+        "fieldsets":fieldsets_small,
+        "values":values,
+        "errors":errors,
+        "global_errors":global_errors,
+        "error_template": function(msg){
+            var div = jQuery("<div>");
+            div.addClass("alert alert-error");
+            div.html(msg);
+            return div;
+        }
+    });
 });
