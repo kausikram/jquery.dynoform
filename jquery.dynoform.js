@@ -27,6 +27,11 @@
             $fieldset.attr("name",fieldset_map[1]);
             $legend = $("<legend>");
             $legend.text(fieldset_map[0]);
+            if(fieldset_map[2]){
+                for(var key in fieldset_map[2]){
+                    $fieldset.attr(key, fieldset_map[2][key]);
+                }
+            }
             $fieldset.append($legend);
             this.$form.append($fieldset);
         }

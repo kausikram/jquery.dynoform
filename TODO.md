@@ -8,6 +8,7 @@ These are a list of things that need to be done:
     * Remove Field
     * Set Value of Field
     * Add Fieldset
+    * Set Error
 * Displaying Errors
     * ~~Element Errors~~
     * ~~Global Errors~~
@@ -15,7 +16,8 @@ These are a list of things that need to be done:
 * Allow adding attributes
     * ~~to form~~
     * ~~to fields~~
-    * to fieldsets
+    * to errors
+    * ~~to fieldsets~~
 * Allow ajax calls
     * for loading structures
     * for loading values
