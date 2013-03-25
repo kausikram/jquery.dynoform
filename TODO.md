@@ -17,10 +17,10 @@ These are a list of things that need to be done:
     * ~~to form~~
     * ~~to fields~~
     * ~~to fieldsets~~
-    * to errors
 * Allow ajax calls
-    * for loading structures
+    * ~~for loading structures~~
     * for loading values
 * Additional input types for which support must be introduced
     * Multiple Select Box
     * html5 inputs
+* Add option to show if a given field is required

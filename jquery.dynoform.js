@@ -1,19 +1,29 @@
 (function ($) {
     function DynoForm(jquery_obj, options){
         this.$element = jquery_obj;
-        this.options = {};
-        this.options["form"] = options["form"];
-        this.options["fields"] = options["fields"];
-        this.options["values"] = options["values"];
-        this.options["buttons"] = options["buttons"];
-        this.options["fieldsets"] = options["fieldsets"];
-        this.options["global_errors"] = options["global_errors"];
-        this.options["errors"] = options["errors"];
-        this.options["errors_template"] = options["error_template"];
-        this.renderForm();
+        this.config = {};
+        this.updateConfig(options);
+        if(this.config["remote_form_structure"]){
+            this.loadRemoteStructure();
+        } else {
+            this.renderForm();
+        }
     }
 
     DynoForm.prototype = {};
+
+    DynoForm.prototype.loadRemoteStructure = function(){
+        var me= this;
+        $.ajax({
+            type:"GET",
+            "url":me.config["remote_form_structure"],
+            "dataType":"json",
+            "success":function(data){
+                me.updateConfig(data);
+                me.renderForm();
+            }
+        });
+    };
 
     DynoForm.prototype.default_configs = {
         "error_template" : null,
@@ -26,16 +36,20 @@
         "values" : {}
     };
 
+    DynoForm.prototype.updateConfig = function(map){
+        $.extend(true, this.config, map);
+    };
+
     DynoForm.prototype.setFormAttrs = function () {
-        for (var key in this.options["form"]) {
-            this.$form.attr(key, this.options["form"][key]);
+        for (var key in this.config["form"]) {
+            this.$form.attr(key, this.config["form"][key]);
         }
     };
 
     DynoForm.prototype.createFieldsets = function () {
         var fieldset_map, $fieldset, $legend;
-        for (var i=0; i<this.options["fieldsets"].length; i++) {
-            fieldset_map = this.options["fieldsets"][i];
+        for (var i=0; i<this.config["fieldsets"].length; i++) {
+            fieldset_map = this.config["fieldsets"][i];
             $fieldset = $("<fieldset>");
             $fieldset.attr("name",fieldset_map[1]);
             $legend = $("<legend>");
@@ -132,31 +146,31 @@
     };
 
     DynoForm.prototype.updateFormFields = function () {
-        for (var i=0; i< this.options["fields"].length; i++) {
-            var field_map = this.options["fields"][i];
+        for (var i=0; i< this.config["fields"].length; i++) {
+            var field_map = this.config["fields"][i];
             this.createLabeledField(field_map);
         }
     };
 
     DynoForm.prototype.updateValues = function () {
-        if(this.options["values"]) {
-            for (var i=0; i< this.options["fields"].length; i++) {
-                var field_map = this.options["fields"][i];
+        if(this.config["values"]) {
+            for (var i=0; i< this.config["fields"].length; i++) {
+                var field_map = this.config["fields"][i];
                 var field_name = field_map["name"];
-                if (!this.options["values"][field_name]) {
+                if (!this.config["values"][field_name]) {
                     continue;
                 }
                 if (field_map["type"] == "checkbox") {
-                    for( var value_index in this.options["values"][field_name]){
-                        this.$form.find("[name='" + field_name +"[]'][value='" + this.options["values"][field_name][value_index] + "']").attr("checked","checked");
+                    for( var value_index in this.config["values"][field_name]){
+                        this.$form.find("[name='" + field_name +"[]'][value='" + this.config["values"][field_name][value_index] + "']").attr("checked","checked");
                     }
                     continue;
                 }
                 if (field_map["type"] == "radio") {
-                    this.$form.find("[name='" + field_name +"'][value='" + this.options["values"][field_name]+ "']").attr("checked","checked");
+                    this.$form.find("[name='" + field_name +"'][value='" + this.config["values"][field_name]+ "']").attr("checked","checked");
                     continue;
                 }
-                this.$form.find("[name='" + field_name +"']").val(this.options["values"][field_name]);
+                this.$form.find("[name='" + field_name +"']").val(this.config["values"][field_name]);
             }
         }
     };
@@ -172,8 +186,8 @@
             return $list;
         }
         var composed_message = $.isArray(message) ? _compose_message(message) : message;
-        if(this.options["errors_template"]){
-            return this.options["errors_template"](composed_message);
+        if(this.config["errors_template"]){
+            return this.config["errors_template"](composed_message);
         }
         var div = $("<div>");
         div.addClass("error");
@@ -182,14 +196,14 @@
     };
 
     DynoForm.prototype.displayErrors = function () {
-        if(this.options["errors"]) {
-            for (var i=0; i< this.options["fields"].length; i++) {
-                var field_map = this.options["fields"][i];
+        if(this.config["errors"]) {
+            for (var i=0; i< this.config["fields"].length; i++) {
+                var field_map = this.config["fields"][i];
                 var field_name = field_map["name"];
-                if (!this.options["errors"][field_name]) {
+                if (!this.config["errors"][field_name]) {
                     continue;
                 }
-                var error_message = this.getErrorMessage(this.options["errors"][field_name]);
+                var error_message = this.getErrorMessage(this.config["errors"][field_name]);
                 var dom_to_atttach_to = this.$form.find("[name='" + field_name +"']:last");
                 if (field_map["type"] == "checkbox") {
                     //name of checkbox altered to
@@ -208,17 +222,17 @@
     };
 
     DynoForm.prototype.displayGlobalError = function(){
-        if(this.options["global_errors"]){
-            var error_message = this.getErrorMessage(this.options["global_errors"]);
+        if(this.config["global_errors"]){
+            var error_message = this.getErrorMessage(this.config["global_errors"]);
         }
         this.$form.prepend(error_message);
     };
 
     DynoForm.prototype.createActionButtons = function () {
-        for (var i in this.options["buttons"]){
+        for (var i in this.config["buttons"]){
             var button = $("<input>");
-            for (var key in this.options["buttons"][i]){
-                button.attr(key,this.options["buttons"][i][key]);
+            for (var key in this.config["buttons"][i]){
+                button.attr(key,this.config["buttons"][i][key]);
             }
             this.$form.append(button);
         }

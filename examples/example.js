@@ -119,4 +119,7 @@ jQuery(document).ready(function(){
             return div;
         }
     });
+    jQuery(".form_container_4").dynoForm({
+        "remote_form_structure":"./structure.json"
+    });
 });
