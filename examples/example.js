@@ -9,6 +9,7 @@ var fields_full = [
     {
         "name":"full_name",
         "label": "Full Name",
+        "required":true,
         "fieldset":"personal",
         "type": "text",
         "extra_attributes": {"placeholder":"Enter Full Name"}

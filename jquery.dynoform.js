@@ -134,7 +134,10 @@
 
     DynoForm.prototype.createLabel = function (field_map) {
         var label = $("<label>");
-        label.text(field_map["label"]);
+        label.html(field_map["label"]);
+        if (field_map["required"]){
+            label.append("<b> * </b>");
+        }
         label.attr("for", field_map["name"]);
         return label;
     };

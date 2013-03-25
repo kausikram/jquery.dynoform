@@ -23,4 +23,5 @@ These are a list of things that need to be done:
 * Additional input types for which support must be introduced
     * Multiple Select Box
     * html5 inputs
-* Add option to show if a given field is required
+    * Support for user defined complex inputs
+* ~~Add option to show if a given field is required~~
