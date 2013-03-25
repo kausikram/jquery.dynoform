@@ -1,8 +1,8 @@
 ### TODO
 These are a list of things that need to be done:
 * Create Events
-    * for form render complete
-    * for form value loaded
+    * ~~for form render complete~~
+    * ~~for form value loaded~~
 * Create Methods
     * To Add Field
     * Remove Field
