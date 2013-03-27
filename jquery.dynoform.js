@@ -248,12 +248,12 @@
         this.createFieldsets();
         this.updateFormFields();
         this.updateValues();
-        this.$element.trigger("dynoform:value_loaded");
+        this.$element.trigger("dynoform:value_loaded", [this.config]);
         this.displayErrors();
         this.displayGlobalError();
         this.createActionButtons();
         this.$element.append(this.$form);
-        this.$element.trigger("dynoform:render_complete");
+        this.$element.trigger("dynoform:render_complete", [this.config]);
     };
 
 
