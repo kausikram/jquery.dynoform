@@ -3,7 +3,7 @@ var form = {
     "action":"."
 };
 var fieldsets_full = [["Personal Details", "personal", {}], ["Contacts", "contacts", {}], ["Survey", "survey", {}]];
-var fieldsets_small = [["Personal Details", "personal", {}]];
+var fieldsets_small = [["Personal Details", "personal", {}], ["Survey", "survey", {}]];
 
 var fields_full = [
     {
@@ -77,6 +77,13 @@ var fields_small = [
         "type":"text"
     },
     {
+        "name": "vehicles",
+        "fieldset":"survey",
+        "label":"What are the types of vehicles you own",
+        "type": "checkbox",
+        "options":[["Car","car"],["Motor Cycle","motor"],["Cycle","cycle"]]
+    },
+    {
         "name": "gender",
         "fieldset":"personal",
         "label":"Gender",
@@ -98,7 +105,7 @@ var buttons = [
     }
 ];
 
-var values = {"full_name":"John Doe", "nick_name":"JD", "gender":"m"};
+var values = {"full_name":"John Doe", "nick_name":"JD", "gender":"m", "vehicles":["car","cycle"]};
 var errors = {"full_name":"Please enter less than 30 charecters.", "gender":"Gender should be selected"};
 var global_errors = ["This form was not submitted properly."];
 

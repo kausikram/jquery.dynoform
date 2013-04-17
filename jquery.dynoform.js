@@ -10,7 +10,15 @@
         }
     }
 
-    DynoForm.prototype = {};
+    DynoForm.available_fields = {};
+
+    DynoForm.add_field = function(field_name, field_class){
+        DynoForm.available_fields[field_name] = field_class;
+    };
+
+    DynoForm.prototype.get_field = function(type){
+        return this.constructor.available_fields[type];
+    };
 
     DynoForm.prototype.loadRemoteStructure = function(){
         var me= this;
@@ -64,72 +72,16 @@
         }
     };
 
-    DynoForm.prototype.createCheckboxAndRadio = function(field_map){
-        var el_list = [];
-        var el, lb;
-        var name = field_map["type"] === "radio" ? field_map["name"] : field_map["name"]+"[]";
-        for(var key in field_map["options"]){
-            lb = $("<label>");
-            el = $("<input>");
-            el.attr("value", field_map["options"][key][1]);
-            el.attr("type", field_map["type"]);
-            el.attr("name", name);
-            lb.append(el);
-            lb.append(field_map["options"][key][0]);
-            el_list.push(lb);
-        }
-        return el_list;
-
-    };
 
     DynoForm.prototype.createField = function (field_map) {
         var el;
-        switch(field_map["type"]) {
-            case undefined:
-                el = $("<input>");
-                el.attr("type","text");
-                break;
-
-            case "text":
-                el = $("<input>");
-                el.attr("type","text");
-                break;
-
-            case "textarea":
-                el = $("<textarea>");
-                break;
-
-            case "password":
-                el = $("<input>");
-                el.attr("type","password");
-                break;
-
-            case "select":
-                el = $("<select>");
-                var option;
-                for(var key in field_map["options"]){
-                    option = $("<option>");
-                    option.attr("value", field_map["options"][key][1]);
-                    option.text(field_map["options"][key][0]);
-                    el.append(option);
-                }
-                break;
-
-            case "checkbox":
-                var data = this.createCheckboxAndRadio(field_map);
-                return data;
-
-            case "radio":
-                return this.createCheckboxAndRadio(field_map);
+        var field_obj = this.get_field(field_map["type"]);
+        if(field_obj){
+            el = field_obj.render(field_map, this);
+            el.data("dynoform-field", field_obj);
+            return el;
         }
-
-        el.attr("name", field_map["name"]);
-        if(field_map["extra_attributes"]){
-            for (var key in field_map["extra_attributes"]){
-                el.attr(key, field_map["extra_attributes"][key]);
-            }
-        }
-        return el;
+        throw "Error field type not defined";
     };
 
     DynoForm.prototype.createLabel = function (field_map) {
@@ -163,17 +115,8 @@
                 if (!this.config["values"][field_name]) {
                     continue;
                 }
-                if (field_map["type"] == "checkbox") {
-                    for( var value_index in this.config["values"][field_name]){
-                        this.$form.find("[name='" + field_name +"[]'][value='" + this.config["values"][field_name][value_index] + "']").attr("checked","checked");
-                    }
-                    continue;
-                }
-                if (field_map["type"] == "radio") {
-                    this.$form.find("[name='" + field_name +"'][value='" + this.config["values"][field_name]+ "']").attr("checked","checked");
-                    continue;
-                }
-                this.$form.find("[name='" + field_name +"']").val(this.config["values"][field_name]);
+                var $field = this.$form.find("[name="+ field_name+ "]");
+                $field.data("dynoform-field").set($field, this.config["values"][field_name]);
             }
         }
     };
@@ -257,6 +200,102 @@
     };
 
 
+    ////////////////////////////////////////////////////
+    ///////////////// TextField ///////////////////////
+    ///////////////////////////////////////////////////
+    var Text = {
+        base_render : function(field_map, dynoform){
+            var el = $("<input>").attr("name", field_map["name"]).attr("type","text");
+            if(field_map["extra_attributes"]){
+                for (var key in field_map["extra_attributes"]){
+                    el.attr(key, field_map["extra_attributes"][key]);
+                }
+            }
+            return el;
+        },
+        render: function(field_map, dynoform){
+            return this.base_render(field_map, dynoform);
+        },
+        set : function(el, value){
+            el.val(value);
+        },
+        val : function(el){
+        }
+    };
+    var Password = {};
+
+    $.extend(Password, Text, {
+        "render": function(field_map, dynoform){
+            var el = this.base_render(field_map, dynoform);
+            el.attr("type","password");
+            return el;
+        }
+    });
+
+    var TextArea = {};
+    $.extend(TextArea, Text, {
+        render : function(field_map, dynoform){
+            var el = $("<textarea>").attr("name", field_map["name"]);
+            if(field_map["extra_attributes"]){
+                for (var key in field_map["extra_attributes"]){
+                    el.attr(key, field_map["extra_attributes"][key]);
+                }
+            }
+            return el;
+        }
+    });
+
+    var Select = {
+        render: function(field_map, dynoform){
+            el = $("<select>");
+            var option;
+            for(var key in field_map["options"]){
+                option = $("<option>");
+                option.attr("value", field_map["options"][key][1]);
+                option.text(field_map["options"][key][0]);
+                el.append(option);
+            }
+            return el;
+        },
+        set : function(el){
+        },
+        val : function(el){
+        }
+    };
+
+
+    var Checkbox = {
+        render : function(field_map, dynoform){
+            var el_list = $("<div>");
+            el_list.attr("name", field_map["name"]);
+            var el, lb;
+            for(var key in field_map["options"]){
+                lb = $("<label>");
+                el = $("<input>");
+                el.attr("value", field_map["options"][key][1]);
+                el.attr("type", field_map["type"]);
+                lb.append(el);
+                lb.append(field_map["options"][key][0]);
+                el_list.append(lb);
+            }
+            return el_list;
+        },
+        set : function(el, value_list){
+            for( var value_index in value_list){
+                el.find("[value='" + value_list[value_index] + "']").attr("checked","checked");
+            }
+        },
+        val : function(el){
+        }
+    };
+
+    var Radio = {};
+    $.extend(Radio,Checkbox, {
+        "set" : function(el, value){
+            el.find("[value='" +  value+ "']").attr("checked","checked");
+        }
+    });
+    
     ///////////////////////////////
     /////// jQuery Plugin /////////
     ///////////////////////////////
@@ -271,4 +310,18 @@
         });
         return this;
     };
+
+    $.dynoForm = {};
+    
+    $.dynoForm.register = function(key, field){
+        DynoForm.add_field(key, field);
+    };
+
+    $.dynoForm.register("text",Text);
+    $.dynoForm.register("passwrod",Password);
+    $.dynoForm.register("textarea",TextArea);
+    $.dynoForm.register("select",Select);
+    $.dynoForm.register("checkbox",Checkbox);
+    $.dynoForm.register("radio",Radio);
+
 }(jQuery));
