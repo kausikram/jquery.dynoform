@@ -200,6 +200,17 @@
     };
 
 
+    /* Exposed Methods */
+    DynoForm.prototype.get_values = function () {
+        var values = {};
+        for (var i=0; i< this.config["fields"].length; i++) {
+            var field_map = this.config["fields"][i];
+            var field_name = field_map["name"];
+            var $field = this.$form.find("[name="+ field_name+ "]");
+            values[field_name] = $field.data("dynoform-field").val($field);
+        }
+        return values;
+    };
     ////////////////////////////////////////////////////
     ///////////////// TextField ///////////////////////
     ///////////////////////////////////////////////////
@@ -220,6 +231,7 @@
             el.val(value);
         },
         val : function(el){
+            return el.val();
         }
     };
     var Password = {};
@@ -257,9 +269,11 @@
             }
             return el;
         },
-        set : function(el){
+        set : function(el, value){
+            el.val(value);
         },
         val : function(el){
+            return el.val();
         }
     };
 
@@ -309,6 +323,12 @@
             }
         });
         return this;
+    };
+
+    $.fn.dynoFormValues = function(){
+        if (this.data("dynoform")) {
+            return this.data("dynoform")["get_values"]();
+        }
     };
 
     $.dynoForm = {};
