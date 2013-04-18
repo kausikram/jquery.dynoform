@@ -107,16 +107,23 @@
         }
     };
 
-    DynoForm.prototype.updateValues = function () {
+    DynoForm.prototype.updateValues = function (values) {
+        var vals = {};
         if(this.config["values"]) {
+            jQuery.extend(vals, this.config["values"]);
+        }
+        if(values){
+            jQuery.extend(vals,values);
+        }
+        if(vals){
             for (var i=0; i< this.config["fields"].length; i++) {
                 var field_map = this.config["fields"][i];
                 var field_name = field_map["name"];
-                if (!this.config["values"][field_name]) {
+                if (!vals[field_name]) {
                     continue;
                 }
                 var $field = this.$form.find("[name="+ field_name+ "]");
-                $field.data("dynoform-field").set($field, this.config["values"][field_name]);
+                $field.data("dynoform-field").set($field, vals[field_name]);
             }
         }
     };
@@ -207,6 +214,7 @@
             var field_map = this.config["fields"][i];
             var field_name = field_map["name"];
             var $field = this.$form.find("[name="+ field_name+ "]");
+            console.log($field);
             values[field_name] = $field.data("dynoform-field").val($field);
         }
         return values;
@@ -259,13 +267,18 @@
 
     var Select = {
         render: function(field_map, dynoform){
-            el = $("<select>");
+            el = $("<select>").attr("name", field_map["name"]);
             var option;
             for(var key in field_map["options"]){
                 option = $("<option>");
                 option.attr("value", field_map["options"][key][1]);
                 option.text(field_map["options"][key][0]);
                 el.append(option);
+            }
+            if(field_map["extra_attributes"]){
+                for (var key in field_map["extra_attributes"]){
+                    el.attr(key, field_map["extra_attributes"][key]);
+                }
             }
             return el;
         },
@@ -292,6 +305,11 @@
                 lb.append(field_map["options"][key][0]);
                 el_list.append(lb);
             }
+            if(field_map["extra_attributes"]){
+                for (var key in field_map["extra_attributes"]){
+                    el.attr(key, field_map["extra_attributes"][key]);
+                }
+            }
             return el_list;
         },
         set : function(el, value_list){
@@ -300,6 +318,12 @@
             }
         },
         val : function(el){
+            var values = [];
+            el.find(":checked").each(function(){
+                var ck = $(this);
+                values.push(ck.attr("value"));
+            })
+            return values;
         }
     };
 
@@ -307,6 +331,14 @@
     $.extend(Radio,Checkbox, {
         "set" : function(el, value){
             el.find("[value='" +  value+ "']").attr("checked","checked");
+        },
+        "val" : function(el){
+            var values = [];
+            el.find(":checked").each(function(){
+                var ck = $(this);
+                values.push(ck.attr("value"));
+            });
+            return values;
         }
     });
     
@@ -325,14 +357,18 @@
         return this;
     };
 
-    $.fn.dynoFormValues = function(){
+    $.fn.dynoFormValues = function(value_map){
         if (this.data("dynoform")) {
-            return this.data("dynoform")["get_values"]();
+            if(value_map) {
+                this.data("dynoform")["updateValues"](value_map);
+            } else {
+                return this.data("dynoform")["get_values"]();
+            }
         }
     };
 
     $.dynoForm = {};
-    
+
     $.dynoForm.register = function(key, field){
         DynoForm.add_field(key, field);
     };
