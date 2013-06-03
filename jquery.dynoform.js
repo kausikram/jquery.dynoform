@@ -40,7 +40,7 @@
         "buttons" : [],
         "fieldsets" : [],
         "fields" : [],
-        "form" : [],
+        "form" : {},
         "values" : {}
     };
 
@@ -368,6 +368,10 @@
     };
 
     $.dynoForm = {};
+
+    $.dynoForm.internals = {
+        "DynoForm" : DynoForm
+    };
 
     $.dynoForm.register = function(key, field){
         DynoForm.add_field(key, field);
