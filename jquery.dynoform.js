@@ -1,7 +1,9 @@
 (function ($) {
     function DynoForm(jquery_obj, options){
         this.$element = jquery_obj;
+        this.$form = null;
         this.config = {};
+        this.updateConfig(this.getDefaultConfigs());
         this.updateConfig(options);
         if(this.config["remote_form_structure"]){
             this.loadRemoteStructure();
@@ -16,7 +18,7 @@
         DynoForm.available_fields[field_name] = field_class;
     };
 
-    DynoForm.prototype.get_field = function(type){
+    DynoForm.prototype.getFieldHandler = function(type){
         return this.constructor.available_fields[type];
     };
 
@@ -33,22 +35,25 @@
         });
     };
 
-    DynoForm.prototype.default_configs = {
-        "error_template" : null,
-        "global_errors" : [],
-        "errors" : [],
-        "buttons" : [],
-        "fieldsets" : [],
-        "fields" : [],
-        "form" : {},
-        "values" : {}
+    DynoForm.prototype.getDefaultConfigs = function() {
+        return {
+            "error_template" : null,
+            "global_errors" : [],
+            "errors" : [],
+            "buttons" : [],
+            "fieldsets" : [],
+            "fields" : [],
+            "form" : {},
+            "values" : {}
+        }
     };
 
     DynoForm.prototype.updateConfig = function(map){
         $.extend(true, this.config, map);
     };
 
-    DynoForm.prototype.setFormAttrs = function () {
+    DynoForm.prototype.createFormElement = function () {
+        this.$form = $("<form>");
         for (var key in this.config["form"]) {
             this.$form.attr(key, this.config["form"][key]);
         }
@@ -75,13 +80,13 @@
 
     DynoForm.prototype.createField = function (field_map) {
         var el;
-        var field_obj = this.get_field(field_map["type"]);
+        var field_obj = this.getFieldHandler(field_map["type"]);
         if(field_obj){
             el = field_obj.render(field_map, this);
             el.data("dynoform-field", field_obj);
             return el;
         }
-        throw "Error field type not defined";
+        throw "Error: field type not defined";
     };
 
     DynoForm.prototype.createLabel = function (field_map) {
@@ -126,6 +131,8 @@
                 $field.data("dynoform-field").set($field, vals[field_name]);
             }
         }
+
+        this.$element.trigger("dynoform:value_loaded", [this.config]);
     };
 
     DynoForm.prototype.getErrorMessage = function(message){
@@ -193,12 +200,10 @@
 
 
     DynoForm.prototype.renderForm = function(){
-        this.$form = $("<form>");
-        this.setFormAttrs();
+        this.createFormElement();
         this.createFieldsets();
         this.updateFormFields();
         this.updateValues();
-        this.$element.trigger("dynoform:value_loaded", [this.config]);
         this.displayErrors();
         this.displayGlobalError();
         this.createActionButtons();
@@ -214,7 +219,6 @@
             var field_map = this.config["fields"][i];
             var field_name = field_map["name"];
             var $field = this.$form.find("[name="+ field_name+ "]");
-            console.log($field);
             values[field_name] = $field.data("dynoform-field").val($field);
         }
         return values;
