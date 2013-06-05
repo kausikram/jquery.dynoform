@@ -307,4 +307,61 @@ describe("DynoForm",function(){
             expect(erro_message_creater).toHaveBeenCalledWith("there was an error");
         });
     });
+
+    describe("displayErrors", function(){
+        var dynoForm;
+        beforeEach(function(){
+            var dom = jQuery("<div>");
+            var DynoForm = jQuery.dynoForm.internals.DynoForm;
+            spyOn(DynoForm.prototype, "renderForm");
+            dynoForm = new DynoForm(dom, test_configs);
+        });
+        it("should display errors based on the config:errors passed", function(){
+            dynoForm.config["errors"] = {"foo":"bar"};
+            spyOn(dynoForm,"getErrorMessage");
+            spyOn(dynoForm,"getFieldSchemaFromConfig");
+            spyOn(dynoForm, "getErrorRenderLocation");
+            var error_render_location = jasmine.createSpyObj("error render location", ["after"]);
+            dynoForm.getErrorRenderLocation.andReturn(error_render_location);
+            dynoForm.getFieldSchemaFromConfig.andReturn({"name":"foo", "type":"input"});
+            dynoForm.displayErrors();
+            expect(dynoForm.getErrorMessage).toHaveBeenCalledWith("bar");
+            expect(dynoForm.getFieldSchemaFromConfig).toHaveBeenCalledWith("foo");
+            expect(dynoForm.getErrorRenderLocation).toHaveBeenCalledWith("foo", {"name":"foo", "type":"input"});
+            expect(error_render_location.after).toHaveBeenCalled();
+        });
+        it("should fail sillenly if a key that is not a defined field is passed", function(){
+            dynoForm.config["errors"] = {"foo":"bar"};
+            spyOn(dynoForm,"getErrorMessage");
+            spyOn(dynoForm,"getFieldSchemaFromConfig");
+            spyOn(dynoForm, "getErrorRenderLocation");
+            dynoForm.getErrorRenderLocation.andReturn(null);
+            dynoForm.getFieldSchemaFromConfig.andReturn(null);
+            dynoForm.displayErrors();
+            expect(dynoForm.getErrorMessage).toHaveBeenCalledWith("bar");
+            expect(dynoForm.getFieldSchemaFromConfig).toHaveBeenCalledWith("foo");
+            expect(dynoForm.getErrorRenderLocation).not.toHaveBeenCalled();
+        });
+    });
+
+    describe("getFieldSchemaFromConfig", function(){
+        var dynoForm;
+        beforeEach(function(){
+            var dom = jQuery("<div>");
+            var DynoForm = jQuery.dynoForm.internals.DynoForm;
+            spyOn(DynoForm.prototype, "renderForm");
+            dynoForm = new DynoForm(dom, test_configs);
+        });
+
+        it("should return the field dict from config for the given field name", function(){
+            var field = {"name":"foo", "type":"text"};
+            dynoForm.config["fields"] = [field];
+            expect(dynoForm.getFieldSchemaFromConfig("foo")).toEqual(field);
+        });
+
+        it("should return null when a field with the given name is not found", function(){
+            dynoForm.config["fields"] = [];
+            expect(dynoForm.getFieldSchemaFromConfig("foo")).toBe(null);
+        });
+    });
 });

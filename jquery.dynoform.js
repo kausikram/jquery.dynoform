@@ -152,28 +152,39 @@
 
     DynoForm.prototype.displayErrors = function () {
         if(this.config["errors"]) {
-            for (var i=0; i< this.config["fields"].length; i++) {
-                var field_map = this.config["fields"][i];
-                var field_name = field_map["name"];
-                if (!this.config["errors"][field_name]) {
-                    continue;
+            for(var key in this.config["errors"]){
+                var error_message = this.getErrorMessage(this.config["errors"][key]);
+                var field_map = this.getFieldSchemaFromConfig(key);
+                if(field_map){
+                    var dom_to_atttach_to = this.getErrorRenderLocation(key, field_map);
+                    dom_to_atttach_to.after(error_message);
                 }
-                var error_message = this.getErrorMessage(this.config["errors"][field_name]);
-                var dom_to_atttach_to = this.$form.find("[name='" + field_name +"']:last");
-                if (field_map["type"] == "checkbox") {
-                    //name of checkbox altered to
-                    dom_to_atttach_to = this.$form.find("[name='" + field_name +"[]']:last").parent();
-
-                }
-                if (field_map["type"] == "radio") {
-                    //name of checkbox altered to
-                    dom_to_atttach_to = this.$form.find("[name='" + field_name +"']:last").parent();
-
-                }
-
-                dom_to_atttach_to.after(error_message);
             }
         }
+    };
+
+    DynoForm.prototype.getFieldSchemaFromConfig = function(field_name){
+        for(var i=0; i<this.config["fields"].length; i++){
+            var field = this.config["fields"][i];
+            if( field["name"]==field_name){
+                return field;
+            }
+        }
+        return null;
+    };
+
+    DynoForm.prototype.getErrorRenderLocation = function (field_name, field_map) {
+        var dom_to_atttach_to = this.$form.find("[name='" + field_name + "']:last");
+        if (field_map["type"] == "checkbox") {
+            //name of checkbox altered to
+            dom_to_atttach_to = this.$form.find("[name='" + field_name + "[]']:last").parent();
+
+        }
+        if (field_map["type"] == "radio") {
+            //name of checkbox altered to
+            dom_to_atttach_to = this.$form.find("[name='" + field_name + "']:last").parent();
+        }
+        return dom_to_atttach_to;
     };
 
     DynoForm.prototype.displayGlobalError = function(){
