@@ -17,6 +17,9 @@ files = [
     'tests.js'
 ];
 
+/*preprocessors = {
+  'jquery.dynoform.js': 'coverage'
+};*/
 
 // list of files to exclude
 exclude = [
@@ -26,8 +29,13 @@ exclude = [
 
 // test results reporter to use
 // possible values: 'dots', 'progress', 'junit', 'growl', 'coverage'
-reporters = ['progress'];
+// reporters = ['progress', 'coverage'];
+ reporters = ['progress'];
 
+coverageReporter = {
+  type : 'html',
+  dir : 'coverage/'
+};
 
 // web server port
 port = 9876;
@@ -73,5 +81,6 @@ singleRun = false;
 // plugins to load
 plugins = [
   'karma-jasmine',
-  'karma-chrome-launcher'
+  'karma-chrome-launcher',
+  //'karma-coverage'
 ];

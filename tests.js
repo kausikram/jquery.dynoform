@@ -13,7 +13,7 @@ describe("DynoForm jQuery Actions",function(){
             "buttons":[],
             "fieldsets":[]
         }
-    })
+    });
     it("should init the dynoform object and save it to the data on data-dynoform", function(){
         var d = jQuery("<div>");
         expect(d.data("dynoform")).toEqual(undefined);
@@ -184,7 +184,127 @@ describe("DynoForm",function(){
             var dynoForm = new DynoForm(dom, test_configs);
             expect(function() { dynoForm.createField({"type":"footype"}) }).toThrow("Error: field type not defined");
         });
-
     });
 
+    describe("createLabel", function(){
+        it("should create and return a label also setting the for attr", function(){
+            var dom = jQuery("<div>");
+            var DynoForm = jQuery.dynoForm.internals.DynoForm;
+            spyOn(DynoForm.prototype, "renderForm");
+            var dynoForm = new DynoForm(dom, test_configs);
+            var label = dynoForm.createLabel({"label":"Name", name:"name"});
+            expect(label.attr("for")).toEqual("name");
+            expect(label.text()).toEqual("Name");
+        });
+        it("should add a * when the field is redquired", function(){
+            var dom = jQuery("<div>");
+            var DynoForm = jQuery.dynoForm.internals.DynoForm;
+            spyOn(DynoForm.prototype, "renderForm");
+            var dynoForm = new DynoForm(dom, test_configs);
+            var label = dynoForm.createLabel({"label":"Name", name:"name", "required":true});
+            expect(label.attr("for")).toEqual("name");
+            expect(label.text()).toContain("Name");
+            expect(label.find("b").length).toEqual(1);
+            expect(label.find("b").text()).toContain("*");
+        })
+    });
+
+    describe("createLabeledField", function(){
+        it("should delegate the call to createLabel and create Field", function(){
+            var dom = jQuery("<div>");
+            var DynoForm = jQuery.dynoForm.internals.DynoForm;
+            spyOn(DynoForm.prototype, "renderForm");
+            var dynoForm = new DynoForm(dom, test_configs);
+            var mock_form = jasmine.createSpyObj("mock form jquery obj", ["find"]);
+            var mock_field_set = jasmine.createSpyObj("mock fieldset jquery obj", ["append"]);
+            dynoForm.$form = mock_form;
+            mock_form.find.andReturn(mock_field_set);
+            spyOn(dynoForm,"createLabel");
+            spyOn(dynoForm,"createField");
+            dynoForm.createLabeledField({});
+            expect(dynoForm.createLabel).toHaveBeenCalled();
+            expect(dynoForm.createField).toHaveBeenCalled();
+            expect(mock_field_set.append).toHaveBeenCalled();
+            expect(mock_field_set.append.callCount).toEqual(2);
+        });
+    });
+
+    describe("updateValues", function(){
+        it("should call the set on the various field handlers", function(){
+            var dom = jQuery("<div>");
+            var DynoForm = jQuery.dynoForm.internals.DynoForm;
+            spyOn(DynoForm.prototype, "renderForm");
+            var dynoForm = new DynoForm(dom, test_configs);
+            var mock_form = jasmine.createSpyObj("mock form jquery obj", ["find"]);
+            var mock_field_handler = jasmine.createSpyObj("mock field handler", ["render","set"]);
+            var mock_field = jasmine.createSpyObj("mock field jquery obj", ["data"]);
+            dynoForm.$form = mock_form;
+            mock_form.find.andReturn(mock_field);
+            mock_field.data.andReturn(mock_field_handler);
+            dynoForm.updateValues({"name":"jdoe"});
+            expect(mock_field_handler.set).toHaveBeenCalledWith(mock_field, "jdoe");
+        });
+
+        it("should not call when values for unknown field are passed", function(){
+            var dom = jQuery("<div>");
+            var DynoForm = jQuery.dynoForm.internals.DynoForm;
+            spyOn(DynoForm.prototype, "renderForm");
+            var dynoForm = new DynoForm(dom, test_configs);
+            var mock_form = jasmine.createSpyObj("mock form jquery obj", ["find"]);
+            var mock_field_handler = jasmine.createSpyObj("mock field handler", ["render","set"]);
+            var mock_field = jasmine.createSpyObj("mock field jquery obj", ["data"]);
+            dynoForm.$form = mock_form;
+            //find returned null instead of the field dom
+            mock_form.find.andReturn(null);
+            mock_field.data.andReturn(mock_field_handler);
+            dynoForm.updateValues({"name":"jdoe"});
+            expect(mock_field_handler.set).not.toHaveBeenCalled();
+        });
+    });
+
+    describe("getValuesSetInConfig", function(){
+        it("should return the values set in config", function(){
+            var dom = jQuery("<div>");
+            var DynoForm = jQuery.dynoForm.internals.DynoForm;
+            spyOn(DynoForm.prototype, "renderForm");
+            var values_dict = {"name":"jdoe","foo":"bar"};
+            test_configs["values"] = values_dict;
+            var dynoForm = new DynoForm(dom, test_configs);
+            expect(dynoForm.getValuesSetInConfig()).toEqual(values_dict);
+        });
+    });
+
+    describe("getErrorMessage", function(){
+        var dynoForm;
+        beforeEach(function(){
+            var dom = jQuery("<div>");
+            var DynoForm = jQuery.dynoForm.internals.DynoForm;
+            spyOn(DynoForm.prototype, "renderForm");
+            dynoForm = new DynoForm(dom, test_configs);
+        });
+
+        it("should create an error message with the default class", function(){
+            var error_div = dynoForm.getErrorMessage("there was an error");
+            expect(error_div.hasClass("error")).toBeTruthy();
+            expect(error_div.text()).toEqual("there was an error");
+        });
+
+        it("should create a list of messages and render it within the default class container", function(){
+            var error_div = dynoForm.getErrorMessage(["there was an error", "there was another as well"]);
+            expect(error_div.hasClass("error")).toBeTruthy();
+            expect(error_div.find("ul").length).toEqual(1);
+            expect(error_div.find("ul").find("li").length).toEqual(2);
+            expect(jQuery(error_div.find("ul").find("li").get(0)).text()).toEqual("there was an error");
+            expect(jQuery(error_div.find("ul").find("li").get(1)).text()).toEqual("there was another as well");
+        });
+
+        it("should use the error message template when provided to it", function(){
+            var erro_message_creater = jasmine.createSpy("mock error creater");
+            dynoForm.config["errors_template"] = erro_message_creater;
+                erro_message_creater.andReturn("boo");
+            var error_div = dynoForm.getErrorMessage("there was an error");
+            expect(error_div).toEqual("boo");
+            expect(erro_message_creater).toHaveBeenCalledWith("there was an error");
+        });
+    });
 });

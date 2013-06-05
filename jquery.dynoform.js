@@ -114,25 +114,20 @@
 
     DynoForm.prototype.updateValues = function (values) {
         var vals = {};
-        if(this.config["values"]) {
-            jQuery.extend(vals, this.config["values"]);
-        }
         if(values){
             jQuery.extend(vals,values);
         }
-        if(vals){
-            for (var i=0; i< this.config["fields"].length; i++) {
-                var field_map = this.config["fields"][i];
-                var field_name = field_map["name"];
-                if (!vals[field_name]) {
-                    continue;
-                }
-                var $field = this.$form.find("[name="+ field_name+ "]");
-                $field.data("dynoform-field").set($field, vals[field_name]);
+        for(var key in vals){
+            var $field = this.$form.find("[name="+ key + "]");
+            if($field){
+                $field.data("dynoform-field").set($field, vals[key]);
             }
         }
-
         this.$element.trigger("dynoform:value_loaded", [this.config]);
+    };
+
+    DynoForm.prototype.getValuesSetInConfig = function(){
+        return this.config.values;
     };
 
     DynoForm.prototype.getErrorMessage = function(message){
@@ -203,7 +198,7 @@
         this.createFormElement();
         this.createFieldsets();
         this.updateFormFields();
-        this.updateValues();
+        this.updateValues(this.getValuesSetInConfig());
         this.displayErrors();
         this.displayGlobalError();
         this.createActionButtons();
@@ -213,7 +208,7 @@
 
 
     /* Exposed Methods */
-    DynoForm.prototype.get_values = function () {
+    DynoForm.prototype.getValues = function () {
         var values = {};
         for (var i=0; i< this.config["fields"].length; i++) {
             var field_map = this.config["fields"][i];
@@ -299,8 +294,8 @@
         render : function(field_map, dynoform){
             var el_list = $("<div>");
             el_list.attr("name", field_map["name"]);
-            var el, lb;
-            for(var key in field_map["options"]){
+            var el, lb, key;
+            for(key in field_map["options"]){
                 lb = $("<label>");
                 el = $("<input>");
                 el.attr("value", field_map["options"][key][1]);
@@ -310,7 +305,7 @@
                 el_list.append(lb);
             }
             if(field_map["extra_attributes"]){
-                for (var key in field_map["extra_attributes"]){
+                for (key in field_map["extra_attributes"]){
                     el.attr(key, field_map["extra_attributes"][key]);
                 }
             }
@@ -326,7 +321,7 @@
             el.find(":checked").each(function(){
                 var ck = $(this);
                 values.push(ck.attr("value"));
-            })
+            });
             return values;
         }
     };
@@ -345,11 +340,11 @@
             return values;
         }
     });
-    
+
     ///////////////////////////////
     /////// jQuery Plugin /////////
     ///////////////////////////////
-    
+
     $.fn.dynoForm = function(options){
         this.each(function(){
             var $this = $(this);
@@ -366,7 +361,7 @@
             if(value_map) {
                 this.data("dynoform")["updateValues"](value_map);
             } else {
-                return this.data("dynoform")["get_values"]();
+                return this.data("dynoform")["getValues"]();
             }
         }
     };

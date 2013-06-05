@@ -17,6 +17,9 @@ files = [
     'tests.js'
 ];
 
+preprocessors = {
+  'jquery.dynoform.js': 'coverage'
+};
 
 // list of files to exclude
 exclude = [
@@ -26,12 +29,16 @@ exclude = [
 
 // test results reporter to use
 // possible values: 'dots', 'progress', 'junit', 'growl', 'coverage'
-reporters = ['dots', "junit"];
+reporters = ['dots', "junit", 'coverage'];
 
 junitReporter = {
   outputFile: 'test-results.xml'
 };
 
+coverageReporter = {
+  type : 'cobertura',
+  dir : 'coverage/'
+};
 
 // web server port
 port = 9876;
@@ -78,5 +85,6 @@ singleRun = true;
 plugins = [
   'karma-jasmine',
   'karma-phantomjs-launcher',
-  'karma-junit-reporter'
+  'karma-junit-reporter',
+  'karma-coverage'
 ];
