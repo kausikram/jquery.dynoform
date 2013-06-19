@@ -7,24 +7,25 @@
     <script type="text/javascript" src="example.js"></script>
     <script type="text/javascript">
         jQuery(document).ready(function(){
-            jQuery(".form_container").dynoForm({
-                "remote_form_structure":"./structure.json"
-            });
+            jQuery(".form_container").dynoForm({"form":form, "fields":fields_small, "buttons":buttons, "fieldsets":fieldsets_small, "values":values});
         });
     </script>
 </head>
 <body>
-<body>
-    <h2>Fetching and Diplaying Remote Form Structure</h2>
+    <h2>Setting Values</h2>
     <h3>Output</h3>
     <div class="form_container"></div>
     <h3>Code</h3>
     <pre>
-        jQuery(".form_container").dynoForm({
-            "remote_form_structure":"./structure.json"
+        var values = {"full_name":"John Doe", "nick_name":"JD", "food":"yes", "vehicles":["car", "motor"]};
+        jQuery(".form_container_2").dynoForm({
+            "form":form,
+            "fields":fields,
+            "buttons":buttons,
+            "fieldsets":fieldsets,
+            "values": values
         });
     </pre>
 </body>
-
-</body>
 </html>
+

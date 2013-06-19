@@ -1,0 +1,34 @@
+<!DOCTYPE HTML>
+<html>
+<head>
+    <title>Example: Dyno Forms</title>
+    <script type="text/javascript" src="http://code.jquery.com/jquery-1.9.1.min.js"></script>
+    <script type="text/javascript" src="../jquery.dynoform.js"></script>
+    <script type="text/javascript" src="example.js"></script>
+    <script type="text/javascript">
+        jQuery(document).ready(function(){
+            jQuery(".form_container").dynoForm({
+                "form":form,
+                "fields":fields_small,
+                "buttons":buttons,
+                "fieldsets":fieldsets_small,
+                "values":values,
+                "errors":errors,
+                "global_errors":global_errors,
+                "error_template": function(msg){
+                    var div = jQuery("<div>");
+                    div.addClass("alert alert-error");
+                    div.html(msg);
+                    return div;
+                }
+            });
+        });
+    </script>
+</head>
+<body>
+
+<div class="form_container">
+</div>
+
+</body>
+</html>

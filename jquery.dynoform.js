@@ -14,11 +14,11 @@
 
     DynoForm.available_fields = {};
 
-    DynoForm.add_field = function(field_name, field_class){
+    DynoForm.add_field = function(field_name, field_class) {
         DynoForm.available_fields[field_name] = field_class;
     };
 
-    DynoForm.prototype.getFieldHandler = function(type){
+    DynoForm.prototype.getFieldHandler = function(type) {
         return this.constructor.available_fields[type];
     };
 

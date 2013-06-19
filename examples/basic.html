@@ -1,18 +1,36 @@
+<!DOCTYPE HTML>
+<html>
+<head>
+    <title>Example: Dyno Forms</title>
+    <script type="text/javascript" src="http://code.jquery.com/jquery-1.9.1.min.js"></script>
+    <script type="text/javascript" src="../jquery.dynoform.js"></script>
+    <script type="text/javascript" src="example.js"></script>
+    <script type="text/javascript">
+        jQuery(document).ready(function(){
+            jQuery(".form_container").dynoForm({"form":form, "fields":fields_full, "buttons":buttons, "fieldsets":fieldsets_full});
+        });
+    </script>
+</head>
+<body>
+    <h2>Basic Usage</h2>
+    <h3>Output</h3>
+    <div class="form_container"></div>
+
+    <h3>Code</h3>
+    <pre>
 var form = {
+    "name" : "form_1",
+    "id" : "form_1",
     "method":"POST",
     "action":"."
 };
-var fieldsets_full = [["Personal Details", "personal", {}], ["Contacts", "contacts", {}], ["Survey", "survey", {}]];
-var fieldsets_small = [["Personal Details", "personal", {}], ["Survey", "survey", {}]];
-
-var fields_full = [
+fieldsets = [["Personal Details", "personal", {}], ["Contacts", "contacts", {}], ["Survey", "survey", {}]];
+var fields = [
     {
         "name":"full_name",
         "label": "Full Name",
-        "required":true,
         "fieldset":"personal",
-        "type": "text",
-        "extra_attributes": {"placeholder":"Enter Full Name"}
+        "type": "text"
     },
     {
         "name": "nick_name",
@@ -62,36 +80,6 @@ var fields_full = [
 
 ];
 
-var fields_small = [
-    {
-        "name":"full_name",
-        "label": "Full Name",
-        "fieldset":"personal",
-        "type": "text",
-        "extra_attributes": {"placeholder":"Enter Full Name"}
-    },
-    {
-        "name": "nick_name",
-        "fieldset":"personal",
-        "label":"Nick Name",
-        "type":"text"
-    },
-    {
-        "name": "vehicles",
-        "fieldset":"survey",
-        "label":"What are the types of vehicles you own",
-        "type": "checkbox",
-        "options":[["Car","car"],["Motor Cycle","motor"],["Cycle","cycle"]]
-    },
-    {
-        "name": "gender",
-        "fieldset":"personal",
-        "label":"Gender",
-        "type":"radio",
-        "options":[["Male","m"], ["Female","f"]]
-    }
-];
-
 var buttons = [
     {
         "type":"submit",
@@ -105,6 +93,12 @@ var buttons = [
     }
 ];
 
-var values = {"full_name":"John Doe", "nick_name":"JD", "gender":"m", "vehicles":["car","cycle"]};
-var errors = {"full_name":"Please enter less than 30 charecters.", "gender":"Gender should be selected"};
-var global_errors = ["This form was not submitted properly."];
+var values = {};
+jQuery(document).ready(function(){
+    jQuery(".form_container").dynoForm({"form":form, "fields":fields, "buttons":buttons, "fieldsets":fieldsets});
+});
+    </pre>
+
+</body>
+</html>
+
