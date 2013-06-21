@@ -41,7 +41,6 @@
             "global_errors" : [],
             "errors" : [],
             "buttons" : [],
-            "fieldsets" : [],
             "fields" : [],
             "form" : {},
             "values" : {}
@@ -57,26 +56,16 @@
         for (var key in this.config["form"]) {
             this.$form.attr(key, this.config["form"][key]);
         }
-    };
-
-    DynoForm.prototype.createFieldsets = function () {
-        var fieldset_map, $fieldset, $legend;
-        for (var i=0; i<this.config["fieldsets"].length; i++) {
-            fieldset_map = this.config["fieldsets"][i];
-            $fieldset = $("<fieldset>");
-            $fieldset.attr("name",fieldset_map[1]);
-            $legend = $("<legend>");
-            $legend.text(fieldset_map[0]);
-            if(fieldset_map[2]){
-                for(var key in fieldset_map[2]){
-                    $fieldset.attr(key, fieldset_map[2][key]);
-                }
+        this.$form.addClass("dynoform_form");
+        if(this.config["layout"]){
+            if (this.config["layout"] == "inline"){
+                this.$form.addClass("form-inline");
             }
-            $fieldset.append($legend);
-            this.$form.append($fieldset);
+            if(this.config["layout"]=="2-column"){
+                this.$form.addClass("form-2-column");
+            }
         }
     };
-
 
     DynoForm.prototype.createField = function (field_map) {
         var el;
@@ -99,16 +88,63 @@
         return label;
     };
 
-    DynoForm.prototype.createLabeledField = function (field_map) {
-        var fieldset = this.$form.find("[name=" + field_map["fieldset"] + "]");
-        fieldset.append(this.createLabel(field_map));
-        fieldset.append(this.createField(field_map));
+    DynoForm.prototype.processLabelForLayout = function(el){
+        if (this.config["layout"] == "2-column"){
+            el.addClass("span2");
+        }
+        return el;
+    };
+
+    DynoForm.prototype.processFieldForLayout = function(el){
+        if (this.config["layout"] == "2-column"){
+            el.addClass("span2");
+        }
+        return el;
+    };
+
+    DynoForm.prototype.createLabeledField = function (field_map, location) {
+        var label = this.createLabel(field_map);
+        var field_el = this.createField(field_map);
+        this.processLabelForLayout(label);
+        this.processFieldForLayout(field_el);
+        location.append(label);
+        location.append(field_el);
+    };
+
+    DynoForm.prototype.findRowOfFieldFromLayout = function(field_map){
+        if (this.config["layout"]=="2-column"){
+            var field_array = $.map(this.config["fields"], function(field){
+                return field["name"];
+            });
+            return (Math.floor($.inArray(field_map["name"], field_array) / 2));
+        }
+
+    };
+    DynoForm.prototype.getFieldRenderLocation = function (field_map) {
+        var form = this.$form ;
+        if(this.config["layout"]=="inline"){
+            return form;
+        }
+        if(this.config["layout"]=="2-column") {
+            var row_number = this.findRowOfFieldFromLayout(field_map);
+            var row_class = "row-"+row_number;
+            if(form.find("." + row_class).length){
+                return form.find("." + row_class);
+            } else {
+                var row_div = $("<div>");
+                row_div.addClass(row_class);
+                row_div.addClass("row row-fluid");
+                form.append(row_div);
+                return row_div;
+            }
+        }
+        return form;
     };
 
     DynoForm.prototype.updateFormFields = function () {
         for (var i=0; i< this.config["fields"].length; i++) {
             var field_map = this.config["fields"][i];
-            this.createLabeledField(field_map);
+            this.createLabeledField(field_map, this.getFieldRenderLocation(field_map));
         }
     };
 
@@ -207,7 +243,6 @@
 
     DynoForm.prototype.renderForm = function(){
         this.createFormElement();
-        this.createFieldsets();
         this.updateFormFields();
         this.updateValues(this.getValuesSetInConfig());
         this.displayErrors();

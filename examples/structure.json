@@ -5,7 +5,6 @@
     {
         "name":"full_name",
         "label":"Full Name",
-        "fieldset":"personal",
         "type":"text",
         "extra_attributes":{
             "placeholder":"Enter Full Name"
@@ -13,13 +12,11 @@
     },
     {
         "name":"nick_name",
-        "fieldset":"personal",
         "label":"Nick Name",
         "type":"text"
     },
     {
         "name":"gender",
-        "fieldset":"personal",
         "label":"Gender",
         "type":"radio",
         "options":[
@@ -38,6 +35,4 @@
         "class":"btn",
         "value":"Clear"
     }
-],"fieldsets":[
-    ["Personal Details","personal",{}]
 ]}

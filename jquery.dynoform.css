@@ -1,0 +1,16 @@
+.dynoform_form.form-inline label {
+    margin-right: 10px;
+}
+
+
+.dynoform_form.form-inline textarea, .dynoform_form.form-inline input[type="text"], .dynoform_form.form-inline input[type="password"], .dynoform_form.form-inline input[type="datetime"], .dynoform_form.form-inline input[type="datetime-local"], .dynoform_form.form-inline input[type="date"], .dynoform_form.form-inline input[type="month"], .dynoform_form.form-inline input[type="time"], .dynoform_form.form-inline input[type="week"], .dynoform_form.form-inline input[type="number"], .dynoform_form.form-inline input[type="email"], .dynoform_form.form-inline input[type="url"], .dynoform_form.form-inline input[type="search"], .dynoform_form.form-inline input[type="tel"], .dynoform_form.form-inline input[type="color"] {
+    margin-right: 10px;
+}
+
+.dynoform_form.form-2-column textarea, .dynoform_form.form-2-column input[type="text"], .dynoform_form.form-2-column input[type="password"], .dynoform_form.form-2-column input[type="datetime"], .dynoform_form.form-2-column input[type="datetime-local"], .dynoform_form.form-2-column input[type="date"], .dynoform_form.form-2-column input[type="month"], .dynoform_form.form-2-column input[type="time"], .dynoform_form.form-2-column input[type="week"], .dynoform_form.form-2-column input[type="number"], .dynoform_form.form-2-column input[type="email"], .dynoform_form.form-2-column input[type="url"], .dynoform_form.form-2-column input[type="search"], .dynoform_form.form-2-column input[type="tel"], .dynoform_form.form-2-column input[type="color"] {
+    float: left;
+}
+
+.dynoform_form.form-2-column row{
+    margin-left: 0;
+}

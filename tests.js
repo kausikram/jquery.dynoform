@@ -10,8 +10,7 @@ describe("DynoForm jQuery Actions",function(){
         test_configs = {
             "form":{},
             "fields":[],
-            "buttons":[],
-            "fieldsets":[]
+            "buttons":[]
         }
     });
     it("should init the dynoform object and save it to the data on data-dynoform", function(){
@@ -34,8 +33,7 @@ describe("DynoForm",function(){
         test_configs = {
             "form":{},
             "fields":[],
-            "buttons":[],
-            "fieldsets":[["Default","default",{"fieldset_foo":"fieldset_bar"}]]
+            "buttons":[]
         }
     });
 
@@ -76,7 +74,6 @@ describe("DynoForm",function(){
             var DynoForm = jQuery.dynoForm.internals.DynoForm;
             var dynoForm = new DynoForm(jQuery("<div>"), test_configs);
             spyOn(dynoForm,"createFormElement");
-            spyOn(dynoForm,"createFieldsets");
             spyOn(dynoForm, "updateFormFields");
             spyOn(dynoForm,"updateValues");
             spyOn(dynoForm,"displayErrors");
@@ -84,7 +81,6 @@ describe("DynoForm",function(){
             spyOn(dynoForm,"createActionButtons");
             dynoForm.renderForm();
             expect(dynoForm.createFormElement).toHaveBeenCalled();
-            expect(dynoForm.createFieldsets).toHaveBeenCalled();
             expect(dynoForm.updateFormFields).toHaveBeenCalled();
             expect(dynoForm.updateValues).toHaveBeenCalled();
             expect(dynoForm.displayErrors).toHaveBeenCalled();
@@ -99,7 +95,6 @@ describe("DynoForm",function(){
             var mock_callback = jasmine.createSpy("mock object");
             dom.on("dynoform:render_complete", mock_callback);
             spyOn(dynoForm,"createFormElement");
-            spyOn(dynoForm,"createFieldsets");
             spyOn(dynoForm, "updateFormFields");
             spyOn(dynoForm,"updateValues");
             spyOn(dynoForm,"displayErrors");
@@ -124,30 +119,18 @@ describe("DynoForm",function(){
             expect(dynoForm.$form.attr("name")).toEqual("kaboom");
             expect(dynoForm.$form.attr("foo")).toEqual("bar");
         });
-    });
 
-    describe("createFieldsets", function(){
-        it("should create the appropriate fieldset elements", function(){
+        it("should add a dynoform_form class to the form element created", function(){
             var dom = jQuery("<div>");
             var DynoForm = jQuery.dynoForm.internals.DynoForm;
             spyOn(DynoForm.prototype, "renderForm");
+            //we dont want to render form directly we want to trigger it manually
+            test_configs["form"] = {"name":"kaboom", "foo":"bar"};
             var dynoForm = new DynoForm(dom, test_configs);
-            dynoForm.$form = jQuery("<form>");
-            expect(dynoForm.$form.find("fieldset").length).toEqual(0);
-            dynoForm.createFieldsets();
-            expect(dynoForm.$form.find("fieldset").length).toEqual(1);
-            expect(dynoForm.$form.find("fieldset").attr("name")).toEqual("default");
-            expect(dynoForm.$form.find("fieldset").attr("fieldset_foo")).toEqual("fieldset_bar");
+            dynoForm.createFormElement();
+            expect(dynoForm.$form.hasClass("dynoform_form")).toBeTruthy();
         });
 
-        it("should handle the case when no fieldsets are passed to the constructor", function(){
-            var dom = jQuery("<div>");
-            var DynoForm = jQuery.dynoForm.internals.DynoForm;
-            spyOn(DynoForm.prototype, "renderForm");
-            delete test_configs["fieldsets"];
-            var dynoForm = new DynoForm(dom, test_configs);
-            dynoForm.createFieldsets();
-        });
     });
 
     describe("createField", function(){
@@ -215,17 +198,18 @@ describe("DynoForm",function(){
             var DynoForm = jQuery.dynoForm.internals.DynoForm;
             spyOn(DynoForm.prototype, "renderForm");
             var dynoForm = new DynoForm(dom, test_configs);
-            var mock_form = jasmine.createSpyObj("mock form jquery obj", ["find"]);
-            var mock_field_set = jasmine.createSpyObj("mock fieldset jquery obj", ["append"]);
-            dynoForm.$form = mock_form;
-            mock_form.find.andReturn(mock_field_set);
+            var mock_form = jasmine.createSpyObj("mock form jquery obj", ["append"]);
             spyOn(dynoForm,"createLabel");
             spyOn(dynoForm,"createField");
-            dynoForm.createLabeledField({});
+            spyOn(dynoForm,"processLabelForLayout");
+            spyOn(dynoForm,"processFieldForLayout");
+            dynoForm.createLabeledField({}, mock_form);
             expect(dynoForm.createLabel).toHaveBeenCalled();
             expect(dynoForm.createField).toHaveBeenCalled();
-            expect(mock_field_set.append).toHaveBeenCalled();
-            expect(mock_field_set.append.callCount).toEqual(2);
+            expect(dynoForm.processLabelForLayout).toHaveBeenCalled();
+            expect(dynoForm.processFieldForLayout).toHaveBeenCalled();
+            expect(mock_form.append).toHaveBeenCalled();
+            expect(mock_form.append.callCount).toEqual(2);
         });
     });
 
@@ -362,6 +346,70 @@ describe("DynoForm",function(){
         it("should return null when a field with the given name is not found", function(){
             dynoForm.config["fields"] = [];
             expect(dynoForm.getFieldSchemaFromConfig("foo")).toBe(null);
+        });
+    });
+
+    describe("getFieldRenderLocation", function(){
+        var dynoForm;
+        beforeEach(function(){
+            var dom = jQuery("<div>");
+            var DynoForm = jQuery.dynoForm.internals.DynoForm;
+            spyOn(DynoForm.prototype, "renderForm");
+            dynoForm = new DynoForm(dom, test_configs);
+        });
+
+        it("should return the form when there is no layout", function(){
+            var mock_form = jasmine.createSpy("mock form");
+            dynoForm.$form = mock_form;
+            expect(dynoForm.getFieldRenderLocation({"name":"first_name", "type":"text"})).toEqual(mock_form);
+        });
+
+        it("should return the form when the layout is inline", function(){
+            var mock_form = jasmine.createSpy("mock form");
+            dynoForm.$form = mock_form;
+            dynoForm.config["layout"] = "inline";
+            expect(dynoForm.getFieldRenderLocation({"name":"first_name", "type":"text"})).toEqual(mock_form);
+        });
+
+        it("should return the nth rowed div if a layout other than the default layout is passed", function(){
+            var mock_form = jQuery("<form>").attr("name","fooname");
+            dynoForm.$form = mock_form;
+            dynoForm.config["layout"] = "2-column";
+
+            spyOn(dynoForm,"findRowOfFieldFromLayout").andReturn(0);
+
+            var field_1 = {"name":"first_name", "type":"text"};
+            var field_2 = {"name":"last_name", "type":"text"};
+            var field_3 = {"name":"address", "type":"text"};
+
+            dynoForm.config["fields"] = [field_1,field_2,field_3];
+
+            var location = dynoForm.getFieldRenderLocation(field_1);
+
+            expect(location.hasClass("row-0")).toBeTruthy();
+            expect(location.parent().attr("name")).toEqual("fooname");
+        });
+
+        it("should not create the nth row more than once when creating field locations for more than one field", function(){
+            var mock_form = jQuery("<form>");
+
+            dynoForm.$form = mock_form;
+            dynoForm.config["layout"] = "2-column";
+
+            spyOn(dynoForm,"findRowOfFieldFromLayout").andReturn(0);
+
+            var field_1 = {"name":"first_name", "type":"text"};
+            var field_2 = {"name":"last_name", "type":"text"};
+            var field_3 = {"name":"address", "type":"text"};
+
+            dynoForm.config["fields"] = [field_1,field_2,field_3];
+
+            dynoForm.getFieldRenderLocation(field_1);
+            var location = dynoForm.getFieldRenderLocation(field_2);
+
+            expect(location.hasClass("row-0")).toBeTruthy();
+            expect(location.parent().find(".row-0").length).toEqual(1);
+
         });
     });
 });

@@ -4,20 +4,33 @@
     <title>Example: Dyno Forms</title>
     <script type="text/javascript" src="http://code.jquery.com/jquery-1.9.1.min.js"></script>
     <link href="http://netdna.bootstrapcdn.com/twitter-bootstrap/2.3.1/css/bootstrap-combined.min.css" rel="stylesheet">
+    <link href="../jquery.dynoform.css" rel="stylesheet">
 
     <script type="text/javascript" src="../jquery.dynoform.js"></script>
-    <link href="../jquery.dynoform.css" rel="stylesheet" type="text/css">
     <script type="text/javascript" src="example.js"></script>
     <script type="text/javascript">
         jQuery(document).ready(function(){
-            jQuery(".form_container").dynoForm({"form":form, "fields":fields_full, "buttons":buttons});
+            jQuery(".form_container_default").dynoForm({"form":form, "fields":fields_full, "buttons":buttons});
+            jQuery(".form_container_inline").dynoForm({"form":form, "fields":fields_full, "buttons":buttons, "layout":"inline"});
+            jQuery(".form_container_two").dynoForm({"form":form, "fields":fields_full, "buttons":buttons, "layout":"2-column"});
+            jQuery(".form_container_custom").dynoForm({"form":form, "fields":fields_full, "buttons":buttons});
         });
     </script>
 </head>
 <body>
-    <h2>Basic Usage</h2>
-    <h3>Output</h3>
-    <div class="form_container"></div>
+    <h2>Layouts</h2>
+
+    <h3>Default Output</h3>
+    <div class="form_container_default"></div>
+
+    <h3>Inline Column</h3>
+    <div class="form_container_inline"></div>
+
+    <h3>Two Column</h3>
+    <div class="form_container_two"></div>
+
+    <h3>Custom Column</h3>
+    <div class="form_container_custom"></div>
 
     <h3>Code</h3>
     <pre>
@@ -27,7 +40,6 @@ var form = {
     "method":"POST",
     "action":"."
 };
-
 var fields = [
     {
         "name":"full_name",
@@ -96,4 +108,3 @@ jQuery(document).ready(function(){
 
 </body>
 </html>
-
