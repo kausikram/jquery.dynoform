@@ -5,8 +5,22 @@ var form = {
 
 var fields_full = [
     {
-        "name":"full_name",
-        "label": "Full Name",
+        "name":"first_name",
+        "label": "First Name",
+        "required":true,
+        "type": "text",
+        "extra_attributes": {"placeholder":"Enter Full Name"}
+    },
+    {
+        "name":"middle_name",
+        "label": "Middle Name",
+        "required":true,
+        "type": "text",
+        "extra_attributes": {"placeholder":"Enter Full Name"}
+    },
+    {
+        "name":"last_name",
+        "label": "Last Name",
         "required":true,
         "type": "text",
         "extra_attributes": {"placeholder":"Enter Full Name"}
@@ -19,6 +33,11 @@ var fields_full = [
     {
         "name": "date_of_birth",
         "label":"Date of Birth",
+        "type":"text"
+    },
+    {
+        "name": "age",
+        "label":"Age",
         "type":"text"
     },
     {
@@ -95,6 +114,11 @@ var values = {"full_name":"John Doe", "nick_name":"JD", "gender":"m", "vehicles"
 var errors = {"full_name":"Please enter less than 30 charecters.", "gender":"Gender should be selected"};
 var global_errors = ["This form was not submitted properly."];
 
-var layout = [
-    ["first_name", "last_name"],
+var custom_layout = [
+    ["first_name", "middle_name", "last_name"],
+    ["nick_name"],
+    ["date_of_birth", "age"],
+    ["contact_phone"],
+    ["address"],
+    ["city"]
 ];

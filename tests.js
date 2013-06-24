@@ -74,14 +74,14 @@ describe("DynoForm",function(){
             var DynoForm = jQuery.dynoForm.internals.DynoForm;
             var dynoForm = new DynoForm(jQuery("<div>"), test_configs);
             spyOn(dynoForm,"createFormElement");
-            spyOn(dynoForm, "updateFormFields");
+            spyOn(dynoForm, "createFormFields");
             spyOn(dynoForm,"updateValues");
             spyOn(dynoForm,"displayErrors");
             spyOn(dynoForm,"displayGlobalError");
             spyOn(dynoForm,"createActionButtons");
             dynoForm.renderForm();
             expect(dynoForm.createFormElement).toHaveBeenCalled();
-            expect(dynoForm.updateFormFields).toHaveBeenCalled();
+            expect(dynoForm.createFormFields).toHaveBeenCalled();
             expect(dynoForm.updateValues).toHaveBeenCalled();
             expect(dynoForm.displayErrors).toHaveBeenCalled();
             expect(dynoForm.displayGlobalError).toHaveBeenCalled();
@@ -95,7 +95,7 @@ describe("DynoForm",function(){
             var mock_callback = jasmine.createSpy("mock object");
             dom.on("dynoform:render_complete", mock_callback);
             spyOn(dynoForm,"createFormElement");
-            spyOn(dynoForm, "updateFormFields");
+            spyOn(dynoForm, "createFormFields");
             spyOn(dynoForm,"updateValues");
             spyOn(dynoForm,"displayErrors");
             spyOn(dynoForm,"displayGlobalError");
@@ -371,7 +371,7 @@ describe("DynoForm",function(){
             expect(dynoForm.getFieldRenderLocation({"name":"first_name", "type":"text"})).toEqual(mock_form);
         });
 
-        it("should return the nth rowed div if a layout other than the default layout is passed", function(){
+        it("should return the nth rowed div for a two column layout", function(){
             var mock_form = jQuery("<form>").attr("name","fooname");
             dynoForm.$form = mock_form;
             dynoForm.config["layout"] = "2-column";
@@ -410,6 +410,72 @@ describe("DynoForm",function(){
             expect(location.hasClass("row-0")).toBeTruthy();
             expect(location.parent().find(".row-0").length).toEqual(1);
 
+        });
+
+        it("should handle custom layout based on arrays when row nu,ber is passed", function(){
+            var mock_form = jQuery("<form>");
+            dynoForm.$form = mock_form;
+            dynoForm.config["layout"] = [["first_name","last_name","address"]];
+            spyOn(dynoForm,"findRowOfFieldFromLayout").andReturn(0);
+            var field_1 = {"name":"first_name", "type":"text"};
+            var field_2 = {"name":"last_name", "type":"text"};
+            var field_3 = {"name":"address", "type":"text"};
+            dynoForm.config["fields"] = [field_1,field_2,field_3];
+            var location = dynoForm.getFieldRenderLocation(field_1, 0);
+            expect(location.hasClass("row-0")).toBeTruthy();
+            location = dynoForm.getFieldRenderLocation(field_2, 0);
+            expect(location.hasClass("row-0")).toBeTruthy();
+            location = dynoForm.getFieldRenderLocation(field_3, 0);
+            expect(location.hasClass("row-0")).toBeTruthy();
+            expect(location.parent().find(".row-0").length).toEqual(1);
+        });
+    });
+
+    describe("processLabelForLayout", function(){
+        var dynoForm;
+        beforeEach(function(){
+            var dom = jQuery("<div>");
+            var DynoForm = jQuery.dynoForm.internals.DynoForm;
+            spyOn(DynoForm.prototype, "renderForm");
+            dynoForm = new DynoForm(dom, test_configs);
+        });
+
+        it("should return the element as such if the layout is not specified", function(){
+            dynoForm.config["layout"] = null;
+            var mock_label = jasmine.createSpy("mock label");
+            expect(dynoForm.processLabelForLayout(mock_label)).toEqual(mock_label);
+        });
+
+        it("should add span2 class on the label when the layout is set o 2-column", function(){
+            dynoForm.config["layout"] = "2-column";
+            var mock_label = jasmine.createSpyObj("mock label",["addClass"]);
+            var label = dynoForm.processLabelForLayout(mock_label);
+            expect(label).toEqual(mock_label);
+            expect(mock_label.addClass).toHaveBeenCalledWith("span2");
+        });
+    });
+
+    describe("processFieldForLayout", function(){
+        var dynoForm;
+        beforeEach(function(){
+            var dom = jQuery("<div>");
+            var DynoForm = jQuery.dynoForm.internals.DynoForm;
+            spyOn(DynoForm.prototype, "renderForm");
+            dynoForm = new DynoForm(dom, test_configs);
+        });
+
+        it("should return the element as such if the layout is not specified", function(){
+            dynoForm.config["layout"] = null;
+            var mock_field = jasmine.createSpy("mock label");
+            expect(dynoForm.processFieldForLayout(mock_field)).toEqual(mock_field);
+        });
+
+        it("should add span2 class on the label when the layout is set o 2-column", function(){
+            dynoForm.config["layout"] = "2-column";
+            var mock_field = jasmine.createSpyObj("mock label",["addClass"]);
+            var label = dynoForm.processFieldForLayout(mock_field);
+            expect(label).toEqual(mock_field);
+            expect(mock_field.addClass).toHaveBeenCalledWith("span2");
         });
     });
 });

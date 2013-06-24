@@ -62,7 +62,10 @@
                 this.$form.addClass("form-inline");
             }
             if(this.config["layout"]=="2-column"){
-                this.$form.addClass("form-2-column");
+                this.$form.addClass("form-multi-column");
+            }
+            if($.isArray(this.config["layout"])){
+                this.$form.addClass("form-multi-column");
             }
         }
     };
@@ -92,11 +95,17 @@
         if (this.config["layout"] == "2-column"){
             el.addClass("span2");
         }
+        if ($.isArray(this.config["layout"])){
+            el.addClass("span2");
+        }
         return el;
     };
 
     DynoForm.prototype.processFieldForLayout = function(el){
         if (this.config["layout"] == "2-column"){
+            el.addClass("span2");
+        }
+        if ($.isArray(this.config["layout"])){
             el.addClass("span2");
         }
         return el;
@@ -118,33 +127,61 @@
             });
             return (Math.floor($.inArray(field_map["name"], field_array) / 2));
         }
-
     };
-    DynoForm.prototype.getFieldRenderLocation = function (field_map) {
+
+    DynoForm.prototype.getRowRenderLocationForField = function(row_number, form){
+        var row_class = "row-"+row_number;
+        if(form.find("." + row_class).length){
+            return form.find("." + row_class);
+        } else {
+            var row_div = $("<div>");
+            row_div.addClass(row_class);
+            row_div.addClass("row row-fluid");
+            form.append(row_div);
+            return row_div;
+        }
+    };
+
+    DynoForm.prototype.getFieldRenderLocation = function (field_map, optional_row_number_for_custom_layout) {
         var form = this.$form ;
         if(this.config["layout"]=="inline"){
             return form;
         }
         if(this.config["layout"]=="2-column") {
             var row_number = this.findRowOfFieldFromLayout(field_map);
-            var row_class = "row-"+row_number;
-            if(form.find("." + row_class).length){
-                return form.find("." + row_class);
-            } else {
-                var row_div = $("<div>");
-                row_div.addClass(row_class);
-                row_div.addClass("row row-fluid");
-                form.append(row_div);
-                return row_div;
-            }
+            return this.getRowRenderLocationForField(row_number, form);
+        }
+        if($.isArray(this.config["layout"])) {
+            return this.getRowRenderLocationForField(optional_row_number_for_custom_layout, form);
         }
         return form;
     };
 
-    DynoForm.prototype.updateFormFields = function () {
-        for (var i=0; i< this.config["fields"].length; i++) {
-            var field_map = this.config["fields"][i];
-            this.createLabeledField(field_map, this.getFieldRenderLocation(field_map));
+    DynoForm.prototype.getFieldConfigMap = function(field_name){
+        var field_map = {};
+        $.each(this.config["fields"], function(row_index, field_item) {
+            if(field_item["name"]==field_name){
+                console.log("bingo", field_item);
+                field_map = field_item;
+            }
+        });
+        return field_map;
+    };
+
+    DynoForm.prototype.createFormFields = function () {
+        var me = this;
+        if($.isArray(this.config["layout"])){
+            $.each(this.config["layout"], function(row_index, row_list) {
+                $.each(row_list, function(index, field_name){
+                    var field_map = me.getFieldConfigMap(field_name);
+                    me.createLabeledField(field_map, me.getFieldRenderLocation(field_map, row_index));
+                });
+            });
+        } else {
+            for (var i=0; i< this.config["fields"].length; i++) {
+                var field_map = this.config["fields"][i];
+                this.createLabeledField(field_map, this.getFieldRenderLocation(field_map));
+            }
         }
     };
 
@@ -243,7 +280,7 @@
 
     DynoForm.prototype.renderForm = function(){
         this.createFormElement();
-        this.updateFormFields();
+        this.createFormFields();
         this.updateValues(this.getValuesSetInConfig());
         this.displayErrors();
         this.displayGlobalError();
