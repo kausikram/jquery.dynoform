@@ -192,7 +192,7 @@
         }
         for(var key in vals){
             var $field = this.$form.find("[name="+ key + "]");
-            if($field){
+            if($field.length){
                 $field.data("dynoform-field").set($field, vals[key]);
             }
         }

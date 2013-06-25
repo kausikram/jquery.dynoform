@@ -224,6 +224,7 @@ describe("DynoForm",function(){
             var mock_field = jasmine.createSpyObj("mock field jquery obj", ["data"]);
             dynoForm.$form = mock_form;
             mock_form.find.andReturn(mock_field);
+            mock_field.length = 1;
             mock_field.data.andReturn(mock_field_handler);
             dynoForm.updateValues({"name":"jdoe"});
             expect(mock_field_handler.set).toHaveBeenCalledWith(mock_field, "jdoe");
@@ -239,7 +240,7 @@ describe("DynoForm",function(){
             var mock_field = jasmine.createSpyObj("mock field jquery obj", ["data"]);
             dynoForm.$form = mock_form;
             //find returned null instead of the field dom
-            mock_form.find.andReturn(null);
+            mock_form.find.andReturn([]);
             mock_field.data.andReturn(mock_field_handler);
             dynoForm.updateValues({"name":"jdoe"});
             expect(mock_field_handler.set).not.toHaveBeenCalled();
